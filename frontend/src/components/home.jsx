@@ -1,8 +1,44 @@
-import { Heart, MessageCircle, Share2, Plus, Home, Target,Trophy, User, MapPin } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Plus, Home, Target, Trophy, User, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function SocialFeed() {
-    const navigate=useNavigate()
+  const navigate = useNavigate();
+
+  // ⭐ Razorpay Payment Function
+  const payNow = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: 100 }),
+      });
+
+      const order = await res.json();
+
+      const options = {
+        key: "rzp_test_SGtmofw4CWXzzG", // 👉 paste your Razorpay key here
+        amount: order.amount,
+        currency: "INR",
+        name: "Prithvi Donation",
+        description: "Support this campaign ❤️",
+        order_id: order.id,
+        handler: function () {
+          alert("Payment Successful 🎉");
+        },
+        theme: { color: "#22c55e" }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      alert("Payment Failed 😢");
+      console.log(err);
+    }
+  };
+
   const posts = [
     {
       id: 1,
@@ -38,16 +74,11 @@ export default function SocialFeed() {
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen">
+
       <div className="sticky top-0 bg-white z-10 border-b border-gray-200">
         <div className="flex items-center justify-between p-4">
           <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-white rounded-lg"></div>
-          </div>
-          <div className="w-6 h-6">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
           </div>
         </div>
 
@@ -64,6 +95,7 @@ export default function SocialFeed() {
       <div className="pb-20">
         {posts.map((post) => (
           <div key={post.id} className="border-b border-gray-200 pb-4">
+
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <img src={post.user.avatar} alt={post.user.name} className="w-10 h-10 rounded-full object-cover" />
@@ -86,7 +118,7 @@ export default function SocialFeed() {
                   $ Supported: $200
                 </button>
               )}
-              
+
               <p className="text-sm mb-2">{post.caption}</p>
               <p className="text-xs text-green-600 mb-3">{post.hashtags}</p>
 
@@ -103,36 +135,45 @@ export default function SocialFeed() {
                   <Share2 className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* ⭐ DONATE BUTTON (UI unchanged) */}
+              <button
+                onClick={payNow}
+                className="w-full bg-blue-500 text-white py-2 rounded-xl mt-3"
+              >
+                Donate ₹100 ❤️
+              </button>
+
             </div>
           </div>
         ))}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto">
-  <div className="flex items-center justify-around py-3">
-    <button className="flex flex-col items-center gap-1 text-green-600">
-      <Home className="w-6 h-6" fill="currentColor" />
-      <span className="text-xs">Home</span>
-    </button>
-    <button onClick={()=>navigate("/acc/home/campaign")} className="flex flex-col items-center gap-1 text-gray-500">
-      <Target className="w-6 h-6" />
-      <span className="text-xs">Campaign</span>
-    </button>
-    <button onClick={()=>navigate("/acc/home/post")} className="flex flex-col items-center gap-1 text-gray-500">
-      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center -mt-6 shadow-lg">
-        <Plus className="w-6 h-6 text-white" strokeWidth={3} />
+        <div className="flex items-center justify-around py-3">
+          <button className="flex flex-col items-center gap-1 text-green-600">
+            <Home className="w-6 h-6" fill="currentColor" />
+            <span className="text-xs">Home</span>
+          </button>
+          <button onClick={() => navigate("/acc/home/campaign")} className="flex flex-col items-center gap-1 text-gray-500">
+            <Target className="w-6 h-6" />
+            <span className="text-xs">Campaign</span>
+          </button>
+          <button onClick={() => navigate("/acc/home/post")} className="flex flex-col items-center gap-1 text-gray-500">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center -mt-6 shadow-lg">
+              <Plus className="w-6 h-6 text-white" strokeWidth={3} />
+            </div>
+          </button>
+          <button onClick={() => navigate("/acc/home/leaderboard")} className="flex flex-col items-center gap-1 text-gray-500">
+            <Trophy className="w-6 h-6" />
+            <span className="text-xs">Leaderboard</span>
+          </button>
+          <button onClick={() => navigate("/acc/home/profile")} className="flex flex-col items-center gap-1 text-gray-500">
+            <User className="w-6 h-6" />
+            <span className="text-xs">Profile</span>
+          </button>
+        </div>
       </div>
-    </button>
-    <button onClick={()=>navigate("/acc/home/leaderboard")} className="flex flex-col items-center gap-1 text-gray-500">
-      <Trophy className="w-6 h-6" />
-      <span className="text-xs">Leaderboard</span>
-    </button>
-    <button onClick={()=>navigate("/acc/home/profile")} className="flex flex-col items-center gap-1 text-gray-500">
-      <User className="w-6 h-6" />
-      <span className="text-xs">Profile</span>
-    </button>
-  </div>
-</div>
     </div>
   );
 }
