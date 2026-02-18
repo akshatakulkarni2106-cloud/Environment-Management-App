@@ -283,5 +283,8 @@ app.get("/post/view", async (req, res) => {
         });
     }
 });
+const paymentRoutes = require("./routes/payment");
+
+app.use("/payment", paymentRoutes);
 
 module.exports = app;
