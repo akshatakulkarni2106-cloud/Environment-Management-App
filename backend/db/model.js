@@ -91,7 +91,12 @@ const Userschema = new mongoose.Schema({
     create_on: {
         type: Date,
         default: Date.now
-    }
+    },
+    notifications: [{
+    message: { type: String },
+    read: { type: Boolean, default: false },
+    created_on: { type: Date, default: Date.now }
+}]
 });
 
 const Postschema = new mongoose.Schema({
@@ -99,8 +104,16 @@ const Postschema = new mongoose.Schema({
         type: Number,
         required: true,
         unique: true,
-        primary: true
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
+    description: {
+    type: String,
+    trim: true,
+    maxlength: 500
+},
     image: {
         type: String,
         trim: true
@@ -118,6 +131,10 @@ const Postschema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    likedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+}],
     posted_on: {
         type: Date,
         default: Date.now
@@ -128,7 +145,69 @@ const Postschema = new mongoose.Schema({
     }
 });
 
+const Campaignschema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
+    },
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 100
+    },
+    description: {
+        type: String,
+        trim: true,
+        maxlength: 1000
+    },
+    image: {
+        type: String
+    },
+    contributionTypes: [{
+        type: String,
+        trim: true
+    }],
+    peopleNeeded: {
+        type: Number,
+        default: 0
+    },
+    progress: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 100
+    },
+    amountRaised: {
+        type: Number,
+        default: 0
+    },
+    joinRequests: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+        status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' }
+    }],
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }],
+    status: {
+        type: String,
+        enum: ['active', 'completed'],
+        default: 'active'
+    },
+    created_on: {
+        type: Date,
+        default: Date.now
+    },
+    joinRequests: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+    status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' }
+}]
+});
+
+const campaignmodel = mongoose.model("campaign", Campaignschema);
 const usermodel = mongoose.model("user", Userschema);
 const postmodel = mongoose.model("post", Postschema);
 
-module.exports = { usermodel, postmodel };
+module.exports = { usermodel, postmodel, campaignmodel };

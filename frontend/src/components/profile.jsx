@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Plus, Home, Target, Trophy, ArrowLeft, MoreVertical, User } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Plus, Home, Target, Trophy, ArrowLeft, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
@@ -30,21 +30,33 @@ export default function Profile() {
         }
     };
 
+    const handleLogout = async () => {
+    try {
+        await fetch('http://localhost:3000/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        navigate('/acc');
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+};
+
     const fetchUserPosts = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/post/view', {
-                credentials: 'include'
-            });
-            const data = await response.json();
-            if (data.success) {
-                setUserPosts(data.posts);
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching posts:', error);
-            setLoading(false);
+    try {
+        const response = await fetch('http://localhost:3000/post/myposts', { // ← changed
+            credentials: 'include'
+        });
+        const data = await response.json();
+        if (data.success) {
+            setUserPosts(data.posts);
         }
-    };
+        setLoading(false);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        setLoading(false);
+    }
+};
 
     if (loading) {
         return (
@@ -72,9 +84,9 @@ export default function Profile() {
                         <ArrowLeft className="w-6 h-6" />
                     </button>
                     <h1 className="font-semibold">My Profile</h1>
-                    <button>
-                        <MoreVertical className="w-6 h-6" />
-                    </button>
+                    <button onClick={handleLogout} className="flex items-center gap-1 text-red-500">
+    <LogOut className="w-5 h-5" />
+</button>
                 </div>
             </div>
 

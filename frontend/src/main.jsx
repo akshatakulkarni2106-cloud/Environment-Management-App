@@ -14,11 +14,16 @@ import Leaderboard from "./components/leaderboard";
 import Post from "./components/post";
 import Profile from "./components/profile";
 import Newacc from "./components/newacc"
+import CreateAcc from "./components/createacc";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Start />,
+  },
+  {
+    path:"/createacc",
+    element:<CreateAcc/>
   },
   {
     path:"/acc",

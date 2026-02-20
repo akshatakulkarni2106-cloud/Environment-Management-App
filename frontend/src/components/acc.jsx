@@ -1,15 +1,39 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { User, Lock, ArrowRight } from 'lucide-react';
 
 export default function Acc() {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        navigate("/acc/home");
+        setError('');
+        setLoading(true);
+
+        try {
+            const res = await fetch('http://localhost:3000/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                navigate("/acc/home");
+            } else {
+                setError(data.message || 'Login failed');
+            }
+        } catch (err) {
+            setError('Server error, please try again');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleSignup = () => {
@@ -32,15 +56,16 @@ export default function Acc() {
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
                         <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                           Username
+                            Username
                         </label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="naturelover"
+                                required
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             />
                         </div>
@@ -62,17 +87,32 @@ export default function Acc() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
+                                required
                                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             />
                         </div>
                     </div>
 
+                    {/* Error message */}
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
+                            {error}
+                        </div>
+                    )}
+
                     <button
                         type="submit"
-                        className="cursor-pointer w-full bg-green-500 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-green-600 transition-colors"
+                        disabled={loading}
+                        className="cursor-pointer w-full bg-green-500 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-green-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        <ArrowRight className="w-5 h-5" />
-                        Login
+                        {loading ? (
+                            <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <>
+                                <ArrowRight className="w-5 h-5" />
+                                Login
+                            </>
+                        )}
                     </button>
                 </form>
 
@@ -92,10 +132,10 @@ export default function Acc() {
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Sign up with Google
+                    Sign in with Google
                 </button>
 
-                <div className="mt-6 text-center">
+                <div onClick={() => navigate("/createacc")} className="mt-6 text-center">
                     <p className="text-sm text-gray-600">
                         Don't have an account?{' '}
                         <button className="cursor-pointer text-green-500 font-semibold">Sign Up</button>
